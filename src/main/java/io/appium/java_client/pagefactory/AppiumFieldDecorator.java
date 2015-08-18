@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.pagefactory.FieldDecorator;
 
@@ -47,20 +48,6 @@ import org.openqa.selenium.support.pagefactory.FieldDecorator;
  * to use with this decorator
  */
 public class AppiumFieldDecorator implements FieldDecorator {
-	
-	private static final List<Class<? extends WebElement>> availableElementClasses = 
-			new ArrayList<Class<? extends WebElement>>(){
-				private static final long serialVersionUID = 1L;
-				{
-					add(WebElement.class);
-					add(RemoteWebElement.class);
-					add(MobileElement.class);
-                    add(TouchableElement.class);
-					add(AndroidElement.class);
-					add(IOSElement.class);
-				}
-		
-	};
 
     private final static Map<Class<? extends SearchContext>, Class<? extends WebElement>> elementRuleMap =
             new HashMap<Class<? extends SearchContext>, Class<? extends WebElement>>(){
@@ -95,53 +82,22 @@ public class AppiumFieldDecorator implements FieldDecorator {
 	}
 
 	public Object decorate(ClassLoader ignored, Field field) {
-		if (!(availableElementClasses.contains(field.getType()) || isDecoratableList(field))) {
-			return null;
-		}
-
 		ElementLocator locator = factory.createLocator(field);
 		if (locator == null) {
 			return null;
 		}
-
-		if (WebElement.class.isAssignableFrom(field.getType())) {
+		if (AppiumElementUtils.isDecoratableElement(field)) {
 			return proxyForLocator(locator);
-		} else if (List.class.isAssignableFrom(field.getType())) {
-			return  proxyForListLocator(locator);
-		} else {
-			return null;
 		}
-	}
-
-	private static boolean isAvailableElementClass(Type type){	
-		boolean result = false;
-		for (Class<? extends WebElement> webElementClass: 
-			availableElementClasses){
-			if (!webElementClass.equals(type)){
-				continue;
-			}
-			result = true;
-			break;
+		if (AppiumElementUtils.isDecoratableList(field)) {
+			return proxyForListLocator(locator);
 		}
-		return result;
-	}
-	
-	private boolean isDecoratableList(Field field) {
-		if (!List.class.isAssignableFrom(field.getType())) {
-			return false;
+		if(AppiumElementUtils.isAndroidElement(field) || AppiumElementUtils.isIOSElement(field)) {
+			MobileElement element = (MobileElement) proxyForLocator(factory.createLocator(field.getType()));
+			PageFactory.initElements(new AppiumElementLocatorFactory(element), element);
+			return element;
 		}
-
-		// Type erasure in Java isn't complete. Attempt to discover the generic
-		// type of the list.
-		Type genericType = field.getGenericType();
-		if (!(genericType instanceof ParameterizedType)) {
-			return false;
-		}
-
-		Type listType = ((ParameterizedType) genericType).getActualTypeArguments()[0];	
-		return isAvailableElementClass(listType);		
-		//if there is no annotation list is supposed to be found by org.openqa.selenium.support.ByIdOrName
-		//DefaultElementLocator has an issue :)
+		return null;
 	}
 
     private Class<?> getTypeForProxy(){
@@ -159,15 +115,13 @@ public class AppiumFieldDecorator implements FieldDecorator {
 
 	private Object proxyForLocator(ElementLocator locator) {
 		ElementInterceptor elementInterceptor = new ElementInterceptor(locator);
-		return ProxyFactory.getEnhancedProxy(getTypeForProxy(),
-				elementInterceptor);
+		return ProxyFactory.getEnhancedProxy(getTypeForProxy(), elementInterceptor);
 	}
 	
 	@SuppressWarnings("unchecked")
 	private List<WebElement> proxyForListLocator(
 			ElementLocator locator) {
 		ElementListInterceptor elementInterceptor = new ElementListInterceptor(locator);
-		return ProxyFactory.getEnhancedProxy(ArrayList.class,
-				elementInterceptor);
+		return ProxyFactory.getEnhancedProxy(ArrayList.class, elementInterceptor);
 	}
 }
