@@ -82,14 +82,13 @@ public class AppiumFieldDecorator implements FieldDecorator {
 	}
 
 	public Object decorate(ClassLoader ignored, Field field) {
-		ElementLocator locator = factory.createLocator(field);
-		if (locator == null) {
-			return null;
-		}
+		ElementLocator locator;
 		if (AppiumElementUtils.isDecoratableElement(field)) {
+			locator = factory.createLocator(field);
 			return proxyForLocator(locator);
 		}
 		if (AppiumElementUtils.isDecoratableList(field)) {
+			locator = factory.createLocator(field);
 			return proxyForListLocator(locator);
 		}
 		if(AppiumElementUtils.isAndroidElement(field) || AppiumElementUtils.isIOSElement(field)) {
