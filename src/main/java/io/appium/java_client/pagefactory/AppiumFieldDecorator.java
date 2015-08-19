@@ -85,16 +85,22 @@ public class AppiumFieldDecorator implements FieldDecorator {
 		ElementLocator locator;
 		if (AppiumElementUtils.isDecoratableElement(field)) {
 			locator = factory.createLocator(field);
-			return proxyForLocator(locator);
+			return proxyForLocator(getTypeForProxy(), locator);
 		}
 		if (AppiumElementUtils.isDecoratableList(field)) {
 			locator = factory.createLocator(field);
 			return proxyForListLocator(locator);
 		}
-		if(AppiumElementUtils.isAndroidElement(field) || AppiumElementUtils.isIOSElement(field)) {
-			MobileElement element = (MobileElement) proxyForLocator(factory.createLocator(field.getType()));
-			PageFactory.initElements(new AppiumElementLocatorFactory(element), element);
+		if(AppiumElementUtils.isDecoratableMobileElement(field)) {
+			locator = factory.createLocator(field.getType());
+			MobileElement element = (MobileElement) proxyForLocator(field.getType(), locator);
+			PageFactory.initElements(new AppiumFieldDecorator(element), element);
 			return element;
+		}
+		if(AppiumElementUtils.isDecoratableMobileElementsList(field)) {
+			Class<? extends MobileElement> clazz = AppiumElementUtils.getGenericParameterClass(field);
+			locator = factory.createLocator(clazz);
+			return proxyForListLocator(clazz, locator);
 		}
 		return null;
 	}
@@ -112,15 +118,21 @@ public class AppiumFieldDecorator implements FieldDecorator {
         return RemoteWebElement.class;
     }
 
-	private Object proxyForLocator(ElementLocator locator) {
+	private Object proxyForLocator(Class<?> clazz, ElementLocator locator) {
 		ElementInterceptor elementInterceptor = new ElementInterceptor(locator);
-		return ProxyFactory.getEnhancedProxy(getTypeForProxy(), elementInterceptor);
+		return ProxyFactory.getEnhancedProxy(clazz, elementInterceptor);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private List<WebElement> proxyForListLocator(
+	private List<? extends WebElement> proxyForListLocator(
 			ElementLocator locator) {
 		ElementListInterceptor elementInterceptor = new ElementListInterceptor(locator);
+		return ProxyFactory.getEnhancedProxy(ArrayList.class, elementInterceptor);
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T extends MobileElement> List<T> proxyForListLocator(Class<T> clazz, ElementLocator locator) {
+		MobileElementListInterceptor elementInterceptor = new MobileElementListInterceptor<>(clazz, locator);
 		return ProxyFactory.getEnhancedProxy(ArrayList.class, elementInterceptor);
 	}
 }

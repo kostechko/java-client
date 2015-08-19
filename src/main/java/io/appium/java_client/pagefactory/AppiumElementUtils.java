@@ -47,35 +47,22 @@ public class AppiumElementUtils {
         return isDecoratableElement(listParameterClass);
     }
 
-    public static boolean isIOSElement(Field field) {
-        return isIOSElement(field.getType());
+    public static boolean isDecoratableMobileElement(Field field) {
+        return isDecoratableMobileElement(field.getType());
     }
 
-    public static boolean isIOSElement(Class<?> clazz) {
-        return IOSElement.class.isAssignableFrom(clazz);
-    }
-    public static boolean isAndroidElement(Field field) {
-        return isAndroidElement(field.getType());
-    }
-
-    public static boolean isAndroidElement(Class<?> clazz) {
-        return AndroidElement.class.isAssignableFrom(clazz);
+    public static boolean isDecoratableMobileElement(Class clazz) {
+        return IOSElement.class.isAssignableFrom(clazz)
+            || AndroidElement.class.isAssignableFrom(clazz)
+            || MobileElement.class.isAssignableFrom(clazz);
     }
 
-    public static boolean isWebElement(Field field) {
-        return isWebElement(field.getType());
-    }
-
-    public static boolean isWebElement(Class<?> clazz) {
-        return WebElement.class.isAssignableFrom(clazz);
-    }
-
-    public static boolean isWebElementList(Field field) {
+    public static boolean isDecoratableMobileElementsList(Field field) {
         if (!isParametrizedList(field)) {
             return false;
         }
         Class listParameterClass = getGenericParameterClass(field);
-        return isWebElement(listParameterClass);
+        return isDecoratableMobileElement(listParameterClass);
     }
 
     public static Class getGenericParameterClass(Field field) {

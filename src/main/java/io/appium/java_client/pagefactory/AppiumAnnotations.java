@@ -29,6 +29,7 @@ import java.util.Map;
 
 import io.appium.java_client.MobileElement;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.ByIdOrName;
 import org.openqa.selenium.support.FindAll;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
@@ -312,9 +313,13 @@ class AppiumAnnotations extends AbstractAnnotations {
 	public By buildBy() {
 		FindBy findBy = annotated.getAnnotation(FindBy.class);
 		FindBys findBys = annotated.getAnnotation(FindBys.class);
+		String name = Field.class.isAssignableFrom(annotated.getClass()) ? ((Field) annotated).getName() :
+				((Class) annotated).getName();
 		Map<ContentType, By> contentMap = new HashMap<ContentType, By>();
 
-		By defaultBy = findBy == null ? buildByFromFindBys(findBys) : buildByFromFindBy(findBy);
+		By defaultBy = new ByIdOrName(name);
+		if(findBys != null) defaultBy = buildByFromFindBys(findBys);
+		if(findBy != null) defaultBy = buildByFromFindBy(findBy);
 		contentMap.put(ContentType.HTML, defaultBy);
 		contentMap.put(ContentType.NATIVE, defaultBy);
 
