@@ -115,7 +115,7 @@ public class AppiumFieldDecorator implements FieldDecorator {
             if (e.getKey().isAssignableFrom(contextClass))
                 return e.getValue();
         } //it is compatible with desktop browser. So at this case it returns RemoteWebElement.class
-        return RemoteWebElement.class;
+        return RemoteWebElement.class; // будет всегда возвращать у дочерних элементов, потому-что левый класс не привести к AndroidElement
     }
 
 	private Object proxyForLocator(Class<?> clazz, ElementLocator locator) {
