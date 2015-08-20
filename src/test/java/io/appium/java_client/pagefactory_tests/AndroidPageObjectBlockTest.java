@@ -10,13 +10,17 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.PageFactory;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertNotNull;
 
 public class AndroidPageObjectBlockTest {
 
@@ -78,7 +82,7 @@ public class AndroidPageObjectBlockTest {
 		catch (Exception e){
 			nsee = (NoSuchElementException) e;
 		}
-		Assert.assertNotNull(nsee);
+		assertNotNull(nsee);
 	}
 
 	@Test
@@ -155,7 +159,7 @@ public class AndroidPageObjectBlockTest {
 		catch (Exception e){
 			nsee = (NoSuchElementException) e;
 		}
-		Assert.assertNotNull(nsee);
+		assertNotNull(nsee);
 	}
 
 	@Test
@@ -213,18 +217,32 @@ public class AndroidPageObjectBlockTest {
     }
 
     @Test
-    public void checkThatTestWillNotBeFailedBecauseOfInvalidFindBy(){
-        try {
-            Assert.assertNotEquals(null, content.elementWhenAndroidLocatorIsNotDefinedAndThereIsInvalidFindBy.getAttribute("text"));
-        }
-        catch (NoSuchElementException ignored){
-            return;
-        }
-        throw new RuntimeException(NoSuchElementException.class.getName() + " has been expected.");
+    public void checkThatTestWillBeFailedBecauseOfInvalidFindBy(){
+		try {
+			content.elementWhenAndroidLocatorIsNotDefinedAndThereIsInvalidFindBy.getAttribute("text");
+		} catch (Throwable e) {
+			while(e.getCause() != null) {
+				e = e.getCause();
+				if(e.getClass().isAssignableFrom(UnsupportedCommandException.class)) {
+					break;
+				}
+			}
+			assertNotNull(e);
+		}
     }
 
-    @Test
-    public void checkThatTestWillNotBeFailedBecauseOfInvalidFindBy_List(){
-        Assert.assertEquals(0, content.elementsWhenAndroidLocatorIsNotDefinedAndThereIsInvalidFindBy.size());
+	@Test
+    public void checkThatTestWillBeFailedBecauseOfInvalidFindBy_List(){
+		try {
+			content.elementsWhenAndroidLocatorIsNotDefinedAndThereIsInvalidFindBy.size();
+		} catch (Throwable e) {
+			while(e.getCause() != null) {
+				e = e.getCause();
+				if(e.getClass().isAssignableFrom(UnsupportedCommandException.class)) {
+					break;
+				}
+			}
+			assertNotNull(e);
+		}
     }
 }
