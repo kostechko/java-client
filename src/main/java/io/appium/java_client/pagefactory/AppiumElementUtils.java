@@ -52,9 +52,17 @@ public class AppiumElementUtils {
     }
 
     public static boolean isDecoratableMobileElement(Class clazz) {
-        return IOSElement.class.isAssignableFrom(clazz)
-            || AndroidElement.class.isAssignableFrom(clazz)
+        return isIOSElement(clazz)
+            || isAndroidElement(clazz)
             || MobileElement.class.isAssignableFrom(clazz);
+    }
+
+    public static boolean isAndroidElement(Class clazz) {
+        return AndroidElement.class.isAssignableFrom(clazz);
+    }
+
+    public static boolean isIOSElement(Class clazz) {
+        return IOSElement.class.isAssignableFrom(clazz);
     }
 
     public static boolean isDecoratableMobileElementsList(Field field) {

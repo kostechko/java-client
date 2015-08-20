@@ -33,6 +33,9 @@ import org.openqa.selenium.support.ui.FluentWait;
 
 import com.google.common.base.Function;
 
+import static io.appium.java_client.pagefactory.AppiumElementUtils.isAndroidElement;
+import static io.appium.java_client.pagefactory.AppiumElementUtils.isIOSElement;
+
 class AppiumElementLocator implements ElementLocator {
 
 	// This function waits for not empty element list using all defined by
@@ -127,23 +130,34 @@ class AppiumElementLocator implements ElementLocator {
 		by = annotations.buildBy();
 	}
 
-    private String getPlatform(){
-        WebDriver d = WebDriverUnpackUtility.
-                unpackWebDriverFromSearchContext(this.searchContext);
-        if (d == null)
-            return null;
+	private Class<? extends WebDriver> getDriverClass() {
+		Class<?> contextClass = this.searchContext.getClass();
+		if(isIOSElement(contextClass))
+			return IOSDriver.class;
+		if(isAndroidElement(contextClass))
+			return AndroidDriver.class;
+		WebDriver d = WebDriverUnpackUtility.unpackWebDriverFromSearchContext(this.searchContext);
+		if (d == null) {
+			return null;
+		} else {
+			return d.getClass();
+		}
+	}
 
-        Class<?> driverClass = d.getClass();
+    private String getPlatform(){
+        Class<?> driverClass = getDriverClass();
+		if (driverClass == null)
+			return null;
         if (AndroidDriver.class.isAssignableFrom(driverClass))
             return MobilePlatform.ANDROID;
-
         if (IOSDriver.class.isAssignableFrom(driverClass))
             return MobilePlatform.IOS;
 
         //it is possible that somebody uses RemoteWebDriver or their
         //own WebDriver implementation. At this case capabilities are used
         //to detect platform
-        if (HasCapabilities.class.isAssignableFrom(driverClass))
+		WebDriver d = WebDriverUnpackUtility.unpackWebDriverFromSearchContext(this.searchContext);
+        if (HasCapabilities.class.isAssignableFrom(d.getClass()))
             return String.valueOf(((HasCapabilities) d).getCapabilities().
                     getCapability(MobileCapabilityType.PLATFORM_NAME));
 
@@ -151,8 +165,10 @@ class AppiumElementLocator implements ElementLocator {
     }
 
     private String getAutomation(){
-        WebDriver d = WebDriverUnpackUtility.
-                unpackWebDriverFromSearchContext(this.searchContext);
+        WebDriver d = null;
+		try {
+			d = WebDriverUnpackUtility.unpackWebDriverFromSearchContext(this.searchContext);
+		} catch (Exception e) {}
         if (d == null)
             return null;
 
