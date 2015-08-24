@@ -79,10 +79,9 @@ class AppiumElementLocator implements ElementLocator {
 	private final SearchContext searchContext;
 	private final boolean shouldCache;
 	private final By by;
+	private final TimeOutDuration timeOutDuration;
 	private WebElement cachedElement;
 	private List<WebElement> cachedElementList;
-
-	private final TimeOutDuration timeOutDuration;
 
 	/**
 	 * Creates a new mobile element locator. It instantiates {@link WebElement}
@@ -96,10 +95,14 @@ class AppiumElementLocator implements ElementLocator {
 	 */
 	AppiumElementLocator(SearchContext searchContext, Field field,
 			TimeOutDuration timeOutDuration) {
+		this(searchContext, field, timeOutDuration, getAutomation(searchContext));
+	}
+
+	AppiumElementLocator(SearchContext searchContext, Field field,
+			TimeOutDuration timeOutDuration, String automation) {
 		this.searchContext = searchContext;
 
 		String platform = getPlatform();
-		String automation = getAutomation();
 
 		AppiumAnnotations annotations = new AppiumAnnotations(field, platform, automation);
         if (field.isAnnotationPresent(WithTimeout.class)){
@@ -114,10 +117,14 @@ class AppiumElementLocator implements ElementLocator {
 
 	<T extends MobileElement> AppiumElementLocator(SearchContext searchContext, Class<T> clazz,
 			TimeOutDuration timeOutDuration) {
+		this(searchContext, clazz, timeOutDuration, getAutomation(searchContext));
+	}
+
+	<T extends MobileElement> AppiumElementLocator(SearchContext searchContext, Class<T> clazz,
+			TimeOutDuration timeOutDuration, String automation) {
 		this.searchContext = searchContext;
 
 		String platform = getPlatform();
-		String automation = getAutomation();
 
 		AppiumAnnotations annotations = new AppiumAnnotations(clazz, platform, automation);
         if (clazz.isAnnotationPresent(WithTimeout.class)){
@@ -164,10 +171,10 @@ class AppiumElementLocator implements ElementLocator {
         return null;
     }
 
-    private String getAutomation(){
+    public static String getAutomation(SearchContext searchContext){
         WebDriver d = null;
 		try {
-			d = WebDriverUnpackUtility.unpackWebDriverFromSearchContext(this.searchContext);
+			d = WebDriverUnpackUtility.unpackWebDriverFromSearchContext(searchContext);
 		} catch (Exception e) {}
         if (d == null)
             return null;
