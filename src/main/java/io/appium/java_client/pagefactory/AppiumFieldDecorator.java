@@ -23,6 +23,7 @@ import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.ios.IOSElement;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -83,26 +84,37 @@ public class AppiumFieldDecorator implements FieldDecorator {
 
 	public Object decorate(ClassLoader ignored, Field field) {
 		ElementLocator locator;
+		String name = getName(field);
 		if (AppiumElementUtils.isDecoratableElement(field)) {
 			locator = factory.createLocator(field);
-			return proxyForLocator(getTypeForProxy(), locator);
+			return proxyForLocator(getTypeForProxy(), locator, name);
 		}
 		if (AppiumElementUtils.isDecoratableList(field)) {
 			locator = factory.createLocator(field);
-			return proxyForListLocator(locator);
+			return proxyForListLocator(locator, name);
 		}
 		if(AppiumElementUtils.isDecoratableMobileElement(field)) {
 			locator = factory.createLocator(field.getType());
-			MobileElement element = (MobileElement) proxyForLocator(field.getType(), locator);
+			MobileElement element = (MobileElement) proxyForLocator(field.getType(), locator, name);
 			PageFactory.initElements(new AppiumFieldDecorator(element), element);
 			return element;
 		}
 		if(AppiumElementUtils.isDecoratableMobileElementsList(field)) {
 			Class<? extends MobileElement> clazz = AppiumElementUtils.getGenericParameterClass(field);
 			locator = factory.createLocator(clazz);
-			return proxyForListLocator(clazz, locator);
+			return proxyForListLocator(clazz, locator, name);
 		}
 		return null;
+	}
+
+	private String getName(Field field) {
+		if(field.isAnnotationPresent(Name.class)) {
+			return field.getAnnotation(Name.class).value();
+		}
+		if(field.getClass().isAnnotationPresent(Name.class)) {
+			return field.getClass().getAnnotation(Name.class).value();
+		}
+		return field.getName();
 	}
 
     private Class<?> getTypeForProxy(){
@@ -118,20 +130,19 @@ public class AppiumFieldDecorator implements FieldDecorator {
         return RemoteWebElement.class; // будет всегда возвращать у дочерних элементов, потому-что левый класс не привести к AndroidElement
     }
 
-	private Object proxyForLocator(Class<?> clazz, ElementLocator locator) {
-		ElementInterceptor elementInterceptor = new ElementInterceptor(locator);
+	private Object proxyForLocator(Class<?> clazz, ElementLocator locator, String name) {
+		ElementInterceptor elementInterceptor = new ElementInterceptor(locator, name);
 		return ProxyFactory.getEnhancedProxy(clazz, elementInterceptor);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private List<? extends WebElement> proxyForListLocator(
-			ElementLocator locator) {
-		ElementListInterceptor elementInterceptor = new ElementListInterceptor(locator);
+	private List<? extends WebElement> proxyForListLocator(ElementLocator locator, String name) {
+		ElementListInterceptor elementInterceptor = new ElementListInterceptor(locator, name);
 		return ProxyFactory.getEnhancedProxy(ArrayList.class, elementInterceptor);
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T extends MobileElement> List<T> proxyForListLocator(Class<T> clazz, ElementLocator locator) {
+	private <T extends MobileElement> List<T> proxyForListLocator(Class<T> clazz, ElementLocator locator, String name) {
 		MobileElementListInterceptor elementInterceptor = new MobileElementListInterceptor<>(clazz, locator);
 		return ProxyFactory.getEnhancedProxy(ArrayList.class, elementInterceptor);
 	}

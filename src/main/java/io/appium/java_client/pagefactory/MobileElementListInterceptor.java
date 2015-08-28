@@ -23,16 +23,21 @@ class MobileElementListInterceptor<T extends MobileElement> implements MethodInt
 
 	private final ElementLocator locator;
 	private final Class<T> elementClass;
+	private final String elementName;
 
-	MobileElementListInterceptor(Class<T> clazz, ElementLocator locator){
+	MobileElementListInterceptor(Class<T> clazz, ElementLocator locator, String name){
 		this.locator = locator;
 		this.elementClass = clazz;
+		this.elementName = name;
 	}
 
 	public Object intercept(Object obj, Method method, Object[] args,
 							MethodProxy proxy) throws Throwable {
 		if(Object.class.getDeclaredMethod("finalize").equals(method)){
 			return proxy.invokeSuper(obj, args);  //invokes .finalize of the proxy-object
+		}
+		if(Object.class.getDeclaredMethod("toString").equals(method)){
+			return elementName;
 		}
 
 		ArrayList<T> realElements = new ArrayList<>();

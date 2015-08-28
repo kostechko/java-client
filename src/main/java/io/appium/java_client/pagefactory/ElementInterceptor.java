@@ -32,15 +32,20 @@ import net.sf.cglib.proxy.MethodProxy;
  */
 class ElementInterceptor implements MethodInterceptor {
     private final ElementLocator locator;
+	private final String elementName;
 	
-	ElementInterceptor(ElementLocator locator) {
+	ElementInterceptor(ElementLocator locator, String name) {
 		this.locator = locator;
+		this.elementName = name;
 	}
 	
 	public Object intercept(Object obj, Method method, Object[] args,
 			MethodProxy proxy) throws Throwable {
         if(Object.class.getDeclaredMethod("finalize").equals(method)){
             return proxy.invokeSuper(obj, args);  //invokes .finalize of the proxy-object
+        }
+        if(Object.class.getDeclaredMethod("toString").equals(method)){
+            return elementName;
         }
 		WebElement realElement = locator.findElement();
 		return method.invoke(realElement, args);
