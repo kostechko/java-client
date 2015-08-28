@@ -143,7 +143,7 @@ public class AppiumFieldDecorator implements FieldDecorator {
 
 	@SuppressWarnings("unchecked")
 	private <T extends MobileElement> List<T> proxyForListLocator(Class<T> clazz, ElementLocator locator, String name) {
-		MobileElementListInterceptor elementInterceptor = new MobileElementListInterceptor<>(clazz, locator);
+		MobileElementListInterceptor elementInterceptor = new MobileElementListInterceptor<>(clazz, locator, name);
 		return ProxyFactory.getEnhancedProxy(ArrayList.class, elementInterceptor);
 	}
 }
