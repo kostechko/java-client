@@ -44,7 +44,7 @@ class ElementInterceptor implements MethodInterceptor {
         if(Object.class.getDeclaredMethod("finalize").equals(method)){
             return proxy.invokeSuper(obj, args);  //invokes .finalize of the proxy-object
         }
-        if(Object.class.getDeclaredMethod("toString").equals(method)){
+        if("toString".equals(method.getName())){
             return elementName;
         }
 		WebElement realElement = locator.findElement();
