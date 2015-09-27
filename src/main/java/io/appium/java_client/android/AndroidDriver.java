@@ -51,7 +51,7 @@ import static io.appium.java_client.remote.MobileCapabilityType.*;
  * {@link AndroidElement}
  */
 public class AndroidDriver<RequiredElementType extends WebElement> extends AppiumDriver<RequiredElementType> implements
-		AndroidDeviceActionShortcuts, HasNetworkConnection, PushesFiles,
+		AndroidDeviceActionShortcuts, HasNetworkConnection, PushesFiles, DeletesFiles,
 		StartsActivity, FindsByAndroidUIAutomator<RequiredElementType> {
 
 	private static final String ANDROID_PLATFORM = MobilePlatform.ANDROID;
@@ -217,6 +217,16 @@ public class AndroidDriver<RequiredElementType extends WebElement> extends Appiu
 		String[] parameters = new String[] { PATH, DATA_PARAM };
 		Object[] values = new Object[] { remotePath, base64Data };
 		execute(PUSH_FILE, getCommandImmutableMap(parameters, values));
+	}
+
+	/**
+	 * @param remotePath
+	 *            Path to file on remote device
+	 * @see DeletesFiles#deleteFile(String)
+	 */
+	@Override
+	public void deleteFile(String remotePath) {
+		execute(DELETE_FILE, ImmutableMap.of(PATH, remotePath));
 	}
 
 	/**

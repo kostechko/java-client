@@ -645,6 +645,8 @@ public abstract class AppiumDriver<RequiredElementType extends WebElement> exten
                         postC("/session/:sessionId/appium/device/pull_file"))
                 .put(PULL_FOLDER,
                         postC("/session/:sessionId/appium/device/pull_folder"))
+                .put(DELETE_FILE,
+                        deleteC("/session/:sessionId/appium/device/delete_file"))
                 .put(HIDE_KEYBOARD,
                         postC("/session/:sessionId/appium/device/hide_keyboard"))
                 .put(PUSH_FILE,
