@@ -37,6 +37,8 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.pagefactory.FieldDecorator;
 
+import static io.appium.java_client.pagefactory.AppiumElementUtils.getGenericParameterClass;
+
 /**
  * Default decorator for use with PageFactory. Will decorate 1) all of the
  * WebElement fields and 2) List<WebElement> fields that have
@@ -113,6 +115,12 @@ public class AppiumFieldDecorator implements FieldDecorator {
 		}
 		if(field.getClass().isAnnotationPresent(Name.class)) {
 			return field.getClass().getAnnotation(Name.class).value();
+		}
+		if(AppiumElementUtils.isDecoratableList(field)) {
+			Class<?> clazz = getGenericParameterClass(field);
+			if(clazz.isAnnotationPresent(Name.class)) {
+				return clazz.getAnnotation(Name.class).value();
+			}
 		}
 		return field.getName();
 	}

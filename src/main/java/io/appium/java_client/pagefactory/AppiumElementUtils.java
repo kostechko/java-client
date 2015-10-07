@@ -25,8 +25,6 @@ public class AppiumElementUtils {
                     add(RemoteWebElement.class);
                     add(MobileElement.class);
                     add(TouchableElement.class);
-                    add(AndroidElement.class);
-                    add(IOSElement.class);
                 }
 
             };

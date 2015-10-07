@@ -33,6 +33,8 @@ import net.sf.cglib.proxy.MethodProxy;
 class ElementInterceptor implements MethodInterceptor {
     private final ElementLocator locator;
 	private final String elementName;
+
+	private WebElement element;
 	
 	ElementInterceptor(ElementLocator locator, String name) {
 		this.locator = locator;
@@ -47,8 +49,12 @@ class ElementInterceptor implements MethodInterceptor {
         if("toString".equals(method.getName())){
             return elementName;
         }
-		WebElement realElement = locator.findElement();
-		return method.invoke(realElement, args);
+		try {
+			return method.invoke(element, args);
+		} catch (Exception e) {
+			element = locator.findElement();
+			return method.invoke(element, args);
+		}
 	}
 
 }
