@@ -20,7 +20,9 @@ import io.appium.java_client.MobileElement;
 
 import java.lang.reflect.Method;
 
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 
 import net.sf.cglib.proxy.MethodInterceptor;
@@ -50,6 +52,9 @@ class ElementInterceptor implements MethodInterceptor {
             return elementName;
         }
 		try {
+			if("getWrappedDriver".equals(method.getName())) {
+				element.getSize();
+			}
 			return method.invoke(element, args);
 		} catch (Exception e) {
 			element = locator.findElement();

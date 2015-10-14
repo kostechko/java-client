@@ -113,8 +113,8 @@ public class AppiumFieldDecorator implements FieldDecorator {
 		if(field.isAnnotationPresent(Name.class)) {
 			return field.getAnnotation(Name.class).value();
 		}
-		if(field.getClass().isAnnotationPresent(Name.class)) {
-			return field.getClass().getAnnotation(Name.class).value();
+		if(field.getType().isAnnotationPresent(Name.class)) {
+			return field.getType().getAnnotation(Name.class).value();
 		}
 		if(AppiumElementUtils.isDecoratableList(field)) {
 			Class<?> clazz = getGenericParameterClass(field);
