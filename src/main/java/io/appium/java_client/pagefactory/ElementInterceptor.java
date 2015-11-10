@@ -55,7 +55,11 @@ class ElementInterceptor implements MethodInterceptor {
 			if("getWrappedDriver".equals(method.getName())) {
 				element.getSize();
 			}
-			return method.invoke(element, args);
+			Object result = method.invoke(element, args);
+			if("isDisplayed".equals(method.getName()) && result.equals(false)) {
+				element.getSize();
+			}
+			return result;
 		} catch (Exception e) {
 			element = locator.findElement();
 			return method.invoke(element, args);
