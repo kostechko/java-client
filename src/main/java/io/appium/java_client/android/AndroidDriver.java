@@ -32,18 +32,25 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.Response;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static io.appium.java_client.MobileCommand.BROADCAST_REFERRER;
 import static io.appium.java_client.MobileCommand.CURRENT_ACTIVITY;
 import static io.appium.java_client.MobileCommand.END_TEST_COVERAGE;
 import static io.appium.java_client.MobileCommand.GET_NETWORK_CONNECTION;
 import static io.appium.java_client.MobileCommand.IS_LOCKED;
+import static io.appium.java_client.MobileCommand.LIST_FILES;
 import static io.appium.java_client.MobileCommand.OPEN_NOTIFICATIONS;
 import static io.appium.java_client.MobileCommand.PRESS_KEY_CODE;
 import static io.appium.java_client.MobileCommand.PUSH_FILE;
+import static io.appium.java_client.MobileCommand.REMOVE_APP;
+import static io.appium.java_client.MobileCommand.REMOVE_FILE;
+import static io.appium.java_client.MobileCommand.REPLACE_APP;
 import static io.appium.java_client.MobileCommand.SET_NETWORK_CONNECTION;
 import static io.appium.java_client.MobileCommand.START_ACTIVITY;
+import static io.appium.java_client.MobileCommand.STOP_APP;
 import static io.appium.java_client.MobileCommand.TOGGLE_LOCATION_SERVICES;
 import static io.appium.java_client.remote.MobileCapabilityType.APP_ACTIVITY;
 import static io.appium.java_client.remote.MobileCapabilityType.APP_PACKAGE;
@@ -63,7 +70,7 @@ import static io.appium.java_client.remote.MobileCapabilityType.DONT_STOP_APP_ON
  * {@link AndroidElement}
  */
 public class AndroidDriver<RequiredElementType extends WebElement> extends AppiumDriver<RequiredElementType> implements
-		AndroidDeviceActionShortcuts, HasNetworkConnection, PushesFiles,
+		AndroidDeviceActionShortcuts, HasNetworkConnection, PushesFiles, CustomCommands,
 		StartsActivity, FindsByAndroidUIAutomator<RequiredElementType> {
 
 	private static final String ANDROID_PLATFORM = MobilePlatform.ANDROID;
@@ -376,6 +383,33 @@ public class AndroidDriver<RequiredElementType extends WebElement> extends Appiu
 	@Override
 	public List<RequiredElementType> findElementsByAndroidUIAutomator(String using) throws WebDriverException {
 		return (List<RequiredElementType>) findElements("-android uiautomator", using);
-	}	
+	}
 
+	@Override
+	public void stopApp() {
+		execute(STOP_APP);
+	}
+
+	@Override
+	public void replaceApp(String appPath) {
+		execute(REPLACE_APP, ImmutableMap.of("appPath", appPath));
+	}
+
+	@Override
+	public List<String> listFiles(String dir) {
+		Response response = execute(LIST_FILES, ImmutableMap.of(PATH, dir));
+		return (List<String>) response.getValue();
+	}
+
+	@Override
+	public void removeFile(String path) {
+		execute(REMOVE_FILE, ImmutableMap.of(PATH, path));
+	}
+
+	@Override
+	public void broadcastReferrer(String pkg, String receiver, HashMap<String, Object> keys) {
+		String[] parameters = new String[] { "package", "receiver", "keys" };
+		Object[] values = new Object[] { pkg, receiver, keys };
+		execute(BROADCAST_REFERRER, getCommandImmutableMap(parameters, values));
+	}
 }

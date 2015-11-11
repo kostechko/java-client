@@ -54,5 +54,10 @@ public interface MobileCommand {
   String SET_SETTINGS = "setSettings";
   String START_ACTIVITY = "startActivity";
   String TOGGLE_LOCATION_SERVICES = "toggleLocationServices";
+  String STOP_APP = "stopApp";
+  String REPLACE_APP = "replaceApp";
+  String REMOVE_FILE = "removeFile";
+  String BROADCAST_REFERRER = "broadcastReferrer";
+  String LIST_FILES = "listFiles";
 
 }
