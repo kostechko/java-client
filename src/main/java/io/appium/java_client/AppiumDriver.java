@@ -684,9 +684,10 @@ public abstract class AppiumDriver<RequiredElementType extends WebElement> exten
                 .put(TOGGLE_LOCATION_SERVICES, postC("/session/:sessionId/appium/device/toggle_location_services"))
                 .put(STOP_APP, postC("/session/:sessionId/appium/device/stop_app"))
                 .put(REPLACE_APP, postC("/session/:sessionId/appium/device/replace_app"))
-                .put(REMOVE_FILE, deleteC("/session/:sessionId/appium/device/remove_file"))
+                .put(REMOVE_FILE, postC("/session/:sessionId/appium/device/remove_file"))
                 .put(BROADCAST_REFERRER, postC("/session/:sessionId/appium/device/broadcast_intent"))
-                .put(LIST_FILES, postC("/session/:sessionId/appium/device/list_files"));
+                .put(LIST_FILES, postC("/session/:sessionId/appium/device/list_files"))
+                .put(IS_SOFT_KEYBOARD_PRESENT, getC("/session/:sessionId/appium/device/is_soft_keyboard_present"));
 
         return builder.build();
     }

@@ -59,5 +59,6 @@ public interface MobileCommand {
   String REMOVE_FILE = "removeFile";
   String BROADCAST_REFERRER = "broadcastReferrer";
   String LIST_FILES = "listFiles";
+  String IS_SOFT_KEYBOARD_PRESENT = "isSoftKeyboardPresent";
 
 }

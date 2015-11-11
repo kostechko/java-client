@@ -41,6 +41,7 @@ import static io.appium.java_client.MobileCommand.CURRENT_ACTIVITY;
 import static io.appium.java_client.MobileCommand.END_TEST_COVERAGE;
 import static io.appium.java_client.MobileCommand.GET_NETWORK_CONNECTION;
 import static io.appium.java_client.MobileCommand.IS_LOCKED;
+import static io.appium.java_client.MobileCommand.IS_SOFT_KEYBOARD_PRESENT;
 import static io.appium.java_client.MobileCommand.LIST_FILES;
 import static io.appium.java_client.MobileCommand.OPEN_NOTIFICATIONS;
 import static io.appium.java_client.MobileCommand.PRESS_KEY_CODE;
@@ -385,31 +386,31 @@ public class AndroidDriver<RequiredElementType extends WebElement> extends Appiu
 		return (List<RequiredElementType>) findElements("-android uiautomator", using);
 	}
 
-	@Override
 	public void stopApp() {
 		execute(STOP_APP);
 	}
 
-	@Override
 	public void replaceApp(String appPath) {
 		execute(REPLACE_APP, ImmutableMap.of("appPath", appPath));
 	}
 
-	@Override
 	public List<String> listFiles(String dir) {
 		Response response = execute(LIST_FILES, ImmutableMap.of(PATH, dir));
 		return (List<String>) response.getValue();
 	}
 
-	@Override
 	public void removeFile(String path) {
 		execute(REMOVE_FILE, ImmutableMap.of(PATH, path));
 	}
 
-	@Override
-	public void broadcastIntent(String intent, String pkg, String receiver, HashMap<String, Object> keys) {
-		String[] parameters = new String[] { "intent", "pkg", "receiver", "keys" };
-		Object[] values = new Object[] { intent, pkg, receiver, keys };
+	public boolean isSoftKeyboardPresent() {
+		Response response = execute(IS_SOFT_KEYBOARD_PRESENT);
+		return (boolean) response.getValue();
+	}
+
+	public void broadcastIntent(String intent, String receiver, HashMap<String, Object> keys) {
+		String[] parameters = new String[] { "intent", "receiver", "keys" };
+		Object[] values = new Object[] { intent, receiver, keys };
 		execute(BROADCAST_REFERRER, getCommandImmutableMap(parameters, values));
 	}
 }

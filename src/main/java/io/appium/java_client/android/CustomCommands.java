@@ -11,5 +11,6 @@ public interface CustomCommands {
     void replaceApp(String path);
     List<String> listFiles(String dir);
     void removeFile(String path);
-    void broadcastIntent(String intent, String pkg, String receiver, HashMap<String, Object> keys);
+    void broadcastIntent(String intent, String receiver, HashMap<String, Object> keys);
+    boolean isSoftKeyboardPresent();
 }
