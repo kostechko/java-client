@@ -407,9 +407,9 @@ public class AndroidDriver<RequiredElementType extends WebElement> extends Appiu
 	}
 
 	@Override
-	public void broadcastReferrer(String pkg, String receiver, HashMap<String, Object> keys) {
-		String[] parameters = new String[] { "package", "receiver", "keys" };
-		Object[] values = new Object[] { pkg, receiver, keys };
+	public void broadcastIntent(String intent, String pkg, String receiver, HashMap<String, Object> keys) {
+		String[] parameters = new String[] { "intent", "package", "receiver", "keys" };
+		Object[] values = new Object[] { intent, pkg, receiver, keys };
 		execute(BROADCAST_REFERRER, getCommandImmutableMap(parameters, values));
 	}
 }
