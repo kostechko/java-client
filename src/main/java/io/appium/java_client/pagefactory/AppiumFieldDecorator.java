@@ -138,8 +138,9 @@ public class AppiumFieldDecorator implements FieldDecorator {
         return RemoteWebElement.class; // будет всегда возвращать у дочерних элементов, потому-что левый класс не привести к AndroidElement
     }
 
+	@SuppressWarnings("unchecked")
 	private Object proxyForLocator(Class<?> clazz, ElementLocator locator, String name) {
-		ElementInterceptor elementInterceptor = new ElementInterceptor(locator, name);
+		ElementInterceptor elementInterceptor = new ElementInterceptor(clazz, locator, name);
 		return ProxyFactory.getEnhancedProxy(clazz, elementInterceptor);
 	}
 	
